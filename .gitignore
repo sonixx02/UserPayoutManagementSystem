@@ -1,0 +1,9 @@
+node_modules/
+payouts.db
+payouts.db-shm
+payouts.db-wal
+*.log
+*.pdf
+*.md
+
+

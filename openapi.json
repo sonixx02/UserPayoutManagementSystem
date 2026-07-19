@@ -1,0 +1,249 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "User Payout Management System API",
+    "version": "1.0.0",
+    "description": "Backend managing affiliate sales payouts"
+  },
+  "servers": [
+    {
+      "url": "/",
+      "description": "Default server"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health check",
+        "responses": {
+          "200": {
+            "description": "Server health status"
+          }
+        }
+      }
+    },
+    "/users": {
+      "post": {
+        "summary": "Create a user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["id"],
+                "properties": {
+                  "id": { "type": "string", "example": "john_doe" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "User created" },
+          "400": { "description": "Missing id" },
+          "409": { "description": "User already exists" }
+        }
+      }
+    },
+    "/users/{id}/balance": {
+      "get": {
+        "summary": "Get user balance",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" }, "example": "john_doe" }
+        ],
+        "responses": {
+          "200": { "description": "User withdrawable balance" }
+        }
+      }
+    },
+    "/users/{id}/transactions": {
+      "get": {
+        "summary": "List transactions ledger of a user",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" }, "example": "john_doe" }
+        ],
+        "responses": {
+          "200": { "description": "List of ledger transaction entries" }
+        }
+      }
+    },
+    "/users/{id}/payouts": {
+      "get": {
+        "summary": "List payouts of a user",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" }, "example": "john_doe" }
+        ],
+        "responses": {
+          "200": { "description": "List of payout entries" }
+        }
+      }
+    },
+    "/users/{id}/sales": {
+      "get": {
+        "summary": "List sales of a user",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" }, "example": "john_doe" }
+        ],
+        "responses": {
+          "200": { "description": "List of sales entries" }
+        }
+      }
+    },
+    "/users/{id}/withdrawals": {
+      "post": {
+        "summary": "Request a withdrawal for a user",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" }, "example": "john_doe" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["amount"],
+                "properties": {
+                  "amount": { "type": "number", "example": 68, "description": "Amount in rupees" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Withdrawal created" },
+          "400": { "description": "Invalid amount" },
+          "409": { "description": "Withdrawal blocked (insufficient balance or 24h limit)" }
+        }
+      }
+    },
+    "/brands": {
+      "get": {
+        "summary": "List all brands",
+        "responses": {
+          "200": { "description": "List of registered brands" }
+        }
+      },
+      "post": {
+        "summary": "Create or update a brand",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name"],
+                "properties": {
+                  "name": { "type": "string", "example": "brand_4" },
+                  "advanceRateBps": { "type": "integer", "example": 200, "description": "Basis points (1000 = 10%)" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Brand created/updated" },
+          "400": { "description": "Invalid input" }
+        }
+      }
+    },
+    "/sales": {
+      "post": {
+        "summary": "Create a pending sale",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userId", "brand", "earning"],
+                "properties": {
+                  "userId": { "type": "string", "example": "john_doe" },
+                  "brand": { "type": "string", "example": "brand_1" },
+                  "earning": { "type": "number", "example": 40, "description": "Earning in rupees" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Sale created" },
+          "400": { "description": "Invalid parameters or user/brand does not exist" }
+        }
+      }
+    },
+    "/sales/{id}/reconcile": {
+      "post": {
+        "summary": "Reconcile a sale (approve or reject)",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["status"],
+                "properties": {
+                  "status": { "type": "string", "enum": ["approved", "rejected"], "example": "approved" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Sale reconciled" }
+        }
+      }
+    },
+    "/jobs/advance-payout": {
+      "post": {
+        "summary": "Run advance payout job for a user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["userId"],
+                "properties": {
+                  "userId": { "type": "string", "example": "john_doe" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Advance job result" },
+          "400": { "description": "Missing userId" }
+        }
+      }
+    },
+    "/payouts/{id}/status": {
+      "post": {
+        "summary": "Update payout status (webhook simulation)",
+        "parameters": [
+          { "name": "id", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["status"],
+                "properties": {
+                  "status": { "type": "string", "enum": ["success", "failed"], "example": "success" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Payout status updated" }
+        }
+      }
+    }
+  }
+}
