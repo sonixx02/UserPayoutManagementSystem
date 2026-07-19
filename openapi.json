@@ -23,12 +23,6 @@
       }
     },
     "/users": {
-      "get": {
-        "summary": "List all users",
-        "responses": {
-          "200": { "description": "List of all registered users" }
-        }
-      },
       "post": {
         "summary": "Create a user",
         "requestBody": {
