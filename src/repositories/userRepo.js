@@ -19,7 +19,7 @@ class UserRepository {
 
   // list all users
   list() {
-    return this.db.prepare('SELECT * FROM users ORDER BY created_at ASC').all();
+    return this.db.prepare('SELECT * FROM users ORDER BY id ASC').all();
   }
 
   // true if the user exists 
