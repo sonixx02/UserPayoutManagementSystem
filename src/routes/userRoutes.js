@@ -18,6 +18,11 @@ module.exports = function userRoutes(c) {
     res.status(201).json(user);
   });
 
+  // list all users
+  router.get('/users', (req, res) => {
+    res.json(c.userRepo.list());
+  });
+
   // get user balance
   router.get('/users/:id/balance', (req, res) => {
     const paise = c.transactionRepo.balance(req.params.id);

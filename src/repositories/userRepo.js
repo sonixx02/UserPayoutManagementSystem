@@ -17,6 +17,11 @@ class UserRepository {
     return this.db.prepare('SELECT * FROM users WHERE id = @id').get({ id });
   }
 
+  // list all users
+  list() {
+    return this.db.prepare('SELECT * FROM users ORDER BY created_at ASC').all();
+  }
+
   // true if the user exists 
   exists(id) {
     return this.findById(id) !== undefined;
